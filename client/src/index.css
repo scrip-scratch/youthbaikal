@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "ABCGravity";
+  src: url("./assets/fonts/ABCGravityCyrillicVariable-Trial.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.custom-font {
+  font-family: "ABCGravity", sans-serif;
+}
