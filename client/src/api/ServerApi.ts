@@ -7,6 +7,7 @@ export interface CreateParticipantDto {
   user_name: string;
   user_phone: string;
   first_time: boolean;
+  spices: string;
   paid: boolean;
 }
 

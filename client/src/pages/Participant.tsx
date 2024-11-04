@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Spinner } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { serverApi } from "../api/ServerApi";
 import { CheckIcon } from "../components/icons/CheckIcon";
 import { CloseIcon } from "../components/icons/CloseIcon";
@@ -23,6 +23,8 @@ export const ParticipantPage = () => {
     setPending(false);
   };
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     getParticipant();
   }, []);
@@ -33,6 +35,16 @@ export const ParticipantPage = () => {
     await serverApi.admitParticipant({
       userId: userId,
       datetime: String(new Date()),
+    });
+    getParticipant();
+  };
+
+  const handleCancelEnter = async () => {
+    if (!userId) return;
+    setPending(true);
+    await serverApi.admitParticipant({
+      userId: userId,
+      datetime: "",
     });
     getParticipant();
   };
@@ -55,6 +67,15 @@ export const ParticipantPage = () => {
 
   return (
     <Container className="d-flex flex-column p-4">
+      <div className="d-flex">
+        <p
+          role="button"
+          className="text-muted text-decoration-underline"
+          onClick={() => navigate("/")}
+        >
+          На главную
+        </p>
+      </div>
       <h6
         className="text-muted mb-2"
         style={{ fontSize: 12 }}
@@ -88,6 +109,19 @@ export const ParticipantPage = () => {
         <Button className="mt-5 w-100 btn" onClick={handleEnter}>
           Записать вход
         </Button>
+      )}
+
+      {participant.enter_date && (
+        <p className="mt-5">
+          Участник уже вошел и использовал QR-код.{" "}
+          <span
+            role="button"
+            onClick={handleCancelEnter}
+            className="text-decoration-underline text-muted"
+          >
+            Отменить вход?
+          </span>
+        </p>
       )}
     </Container>
   );

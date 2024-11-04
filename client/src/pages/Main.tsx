@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Form, Spinner, Table } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CreateParticipantDto, serverApi } from "../api/ServerApi";
 import { MainContainer } from "../components/MainContainer";
 import { CloseIcon } from "../components/icons/CloseIcon";
@@ -17,6 +17,7 @@ export interface Participant {
   user_name: string;
   user_phone: string;
   first_time: boolean;
+  spices: string;
   paid: boolean;
   enter_date: string;
 }
@@ -40,6 +41,7 @@ export const Main = () => {
     setPending(true);
     const response = await serverApi.getParticipants();
     if (response && response.status === 200) {
+      console.log(response.data.participants); // TODO: DELETE DEV LOG
       setParticipants(response.data.participants);
     }
     setPending(false);
@@ -100,7 +102,7 @@ export const Main = () => {
     : participants;
 
   return (
-    <Container className="d-flex flex-column p-2" style={{ minWidth: 920 }}>
+    <Container className="d-flex flex-column p-2" style={{ minWidth: 1024 }}>
       <div className="d-flex">
         <p
           role="button"
@@ -128,11 +130,11 @@ export const Main = () => {
       <Table>
         <thead>
           <tr>
-            <th>#</th>
             <th>Имя</th>
             <th>Телефон</th>
             <th>Первый раз</th>
             <th>Оплата</th>
+            <th>Обед</th>
             <th>Дата входа</th>
             <th></th>
           </tr>
@@ -141,8 +143,14 @@ export const Main = () => {
           {filteredParticipants.map((participant, index) => {
             return (
               <tr key={`participant-${index}`}>
-                <td>{index}</td>
-                <td>{participant.user_name}</td>
+                <td>
+                  <Link
+                    to={`/participant/${participant.user_id}`}
+                    className="text-dark"
+                  >
+                    {participant.user_name}
+                  </Link>
+                </td>
                 <td>{participant.user_phone}</td>
                 <td>
                   {participant.first_time ? (
@@ -158,6 +166,7 @@ export const Main = () => {
                     <CloseIcon size={25} />
                   )}
                 </td>
+                <td style={{ maxWidth: 200 }}>{participant.spices}</td>
                 <td>
                   {participant.enter_date
                     ? getDateFormat(participant.enter_date)

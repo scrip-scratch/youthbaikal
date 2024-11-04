@@ -12,6 +12,7 @@ export default function CreateModal(props: {
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
+  const [spices, setSpices] = useState<string>("");
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [paid, setPaid] = useState<boolean>(false);
 
@@ -29,6 +30,7 @@ export default function CreateModal(props: {
       user_phone: phone,
       first_time: firstTime,
       paid: paid,
+      spices: spices,
     });
   };
 
@@ -67,6 +69,16 @@ export default function CreateModal(props: {
                 setPhoneError(false);
               }}
               isInvalid={phoneError}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Обеды</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              value={spices}
+              onChange={(e) => setSpices(e.target.value)}
             />
           </Form.Group>
           <Form.Check

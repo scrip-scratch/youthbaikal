@@ -21,6 +21,9 @@ export class Participant {
   user_phone: string = "";
 
   @Column()
+  spices: string = "";
+
+  @Column()
   first_time: boolean = false;
 
   @Column()

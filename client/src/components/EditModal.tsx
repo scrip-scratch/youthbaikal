@@ -15,6 +15,7 @@ export default function EditModal(props: {
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
+  const [spices, setSpices] = useState<string>("");
   const [phoneError, setPhoneError] = useState<boolean>(false);
 
   const handleSumbit = () => {
@@ -33,6 +34,7 @@ export default function EditModal(props: {
         user_phone: phone,
         first_time: firstTime,
         paid: paid,
+        spices: spices,
       },
     });
   };
@@ -42,6 +44,7 @@ export default function EditModal(props: {
     setFirstTime(props.participant.first_time);
     setUsername(props.participant.user_name);
     setPhone(props.participant.user_phone);
+    setSpices(props.participant.spices);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.show]);
 
@@ -74,6 +77,16 @@ export default function EditModal(props: {
                 setPhoneError(false);
               }}
               isInvalid={phoneError}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Обеды</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              value={spices}
+              onChange={(e) => setSpices(e.target.value)}
             />
           </Form.Group>
           <Form.Check

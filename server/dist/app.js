@@ -47,7 +47,7 @@ const AppDataSource = new typeorm_1.DataSource({
     host: "localhost",
     password: "zR5mC6wS7i",
     connectTimeout: 100000,
-    synchronize: false,
+    synchronize: true,
 });
 AppDataSource.initialize()
     .then(async (connection) => {
@@ -94,14 +94,51 @@ AppDataSource.initialize()
             user_name: req.body.user_name,
             first_time: req.body.first_time,
             user_phone: req.body.user_phone,
-            paid: req.body.user_phone.paid,
+            paid: req.body.paid,
+            spices: req.body.spices,
+            enter_date: "",
+        });
+        const response = await participantRepository.save(participant);
+        res.json(response);
+    });
+    // {
+    //   body: {
+    //     Name: 'test',
+    //     Surname: 'test',
+    //     Date: '01-01-1970',
+    //     Pol: 'Мужской',
+    //     Phone: '+7 (999) 999-99-99',
+    //     Email: 'test@test.ru',
+    //     'Сity': 'test',
+    //     'Сhurch': 'test',
+    //     Resettlement: 'Нет',
+    //     First: 'Нет',
+    //     'Сontact': 'Telegram',
+    //     spices: 'На 31 января — Боул, пирожное и чай (370₽); На 31 января — Сэндвич, пирожное и чай (280₽); На 1 ф
+    // евраля — Сэндвич, пирожное и чай (280₽)',
+    //     payment: '{"sys":"none","systranid":"0","orderid":"1118197065","products":["Участие ЮС Байкал 2025=1000","
+    // На 31 января  Боул, пирожное и чай 370=370","На 1 февраля  Сэндвич, пирожное и чай 280=280","На 31 января  Сэн
+    // двич, пирожное и чай 280=280"],"amount":"1930"}',
+    //     formid: 'form818317054',
+    //     formname: 'Cart'
+    //   },
+    //   success: true
+    // }
+    app.post("/tilda/participants/create", async (req, res) => {
+        const participant = participantRepository.create({
+            user_id: (0, uuid_1.v4)(),
+            user_name: req.body.Name,
+            first_time: req.body.First !== "Нет",
+            user_phone: req.body.Phone,
+            paid: false,
+            spices: req.body.spices,
             enter_date: "",
         });
         const response = await participantRepository.save(participant);
         res.json(response);
     });
     app.put("/participants/update/:id", async (req, res) => {
-        const { paid, user_name, user_phone, first_time, token } = req.body;
+        const { paid, user_name, user_phone, first_time, token, spices } = req.body;
         if (token !== secretToken) {
             res.status(401).json({ message: "Нет прав на редактирование" });
             return;
@@ -118,6 +155,7 @@ AppDataSource.initialize()
             participant.user_name = user_name;
             participant.user_phone = user_phone;
             participant.first_time = first_time;
+            participant.spices = spices;
             const updatedUser = await participantRepository.save(participant);
             res.status(200).json(updatedUser);
         }

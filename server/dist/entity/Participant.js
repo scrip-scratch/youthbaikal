@@ -17,6 +17,7 @@ let Participant = class Participant {
         this.user_id = "";
         this.user_name = "";
         this.user_phone = "";
+        this.spices = "";
         this.first_time = false;
         this.paid = false;
         this.enter_date = "";
@@ -39,6 +40,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Participant.prototype, "user_phone", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Participant.prototype, "spices", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
