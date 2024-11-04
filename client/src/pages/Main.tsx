@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Container, Spinner, Table } from "react-bootstrap";
+import { Container, Form, Spinner, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { serverApi } from "../api/ServerApi";
+import { CreateParticipantDto, serverApi } from "../api/ServerApi";
 import { MainContainer } from "../components/MainContainer";
 import { CloseIcon } from "../components/icons/CloseIcon";
 import { CheckIcon } from "../components/icons/CheckIcon";
@@ -10,6 +10,7 @@ import QrModal from "../components/QrModal";
 import { EditIcon } from "../components/icons/EditIcon";
 import EditModal from "../components/EditModal";
 import { getDateFormat } from "../utils/getDateFormat";
+import CreateModal from "../components/CreateModal";
 
 export interface Participant {
   user_id: string;
@@ -29,7 +30,9 @@ export const Main = () => {
   const [participantToEdit, setParticipantToEdit] =
     useState<Participant | null>(null);
   const [qrModal, setQrModal] = useState<boolean>(true);
-  const [editModal, setEditModal] = useState<boolean>(true);
+  const [editModal, setEditModal] = useState<boolean>(false);
+  const [createModal, setCreateModal] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -64,11 +67,16 @@ export const Main = () => {
 
   const updatePaticipant = async (params: {
     userId: string;
-    paid: boolean;
+    data: CreateParticipantDto;
   }) => {
-    setEditModal(false);
     setPending(true);
     await serverApi.updateParticipant(params);
+    getParticipants();
+  };
+
+  const createPaticipant = async (params: CreateParticipantDto) => {
+    setPending(true);
+    await serverApi.createUser(params);
     getParticipants();
   };
 
@@ -85,9 +93,22 @@ export const Main = () => {
     );
   }
 
+  const filteredParticipants = search
+    ? participants.filter((i) =>
+        i.user_name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+      )
+    : participants;
+
   return (
     <Container className="d-flex flex-column p-2" style={{ minWidth: 920 }}>
       <div className="d-flex">
+        <p
+          role="button"
+          className="text-muted text-decoration-underline"
+          onClick={() => setCreateModal(true)}
+        >
+          Добавить участника
+        </p>
         <p
           role="button"
           className="text-muted text-decoration-underline ms-auto"
@@ -96,6 +117,14 @@ export const Main = () => {
           Выйти
         </p>
       </div>
+      <Form.Group className="mt-3 mb-5">
+        <Form.Control
+          placeholder="Поиск..."
+          className="w-100"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Form.Group>
       <Table>
         <thead>
           <tr>
@@ -109,7 +138,7 @@ export const Main = () => {
           </tr>
         </thead>
         <tbody>
-          {participants.map((participant, index) => {
+          {filteredParticipants.map((participant, index) => {
             return (
               <tr key={`participant-${index}`}>
                 <td>{index}</td>
@@ -138,7 +167,7 @@ export const Main = () => {
                   <div className="d-flex">
                     <div
                       role="button"
-                      className="me-2"
+                      className="me-4"
                       onClick={() => {
                         setParticipantToQr(participant);
                         setQrModal(true);
@@ -177,6 +206,11 @@ export const Main = () => {
           onSubmit={updatePaticipant}
         />
       )}
+      <CreateModal
+        show={createModal}
+        onHide={() => setCreateModal(false)}
+        onSubmit={createPaticipant}
+      />
     </Container>
   );
 };

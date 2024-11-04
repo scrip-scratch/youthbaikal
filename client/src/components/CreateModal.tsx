@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
-import { Participant } from "../pages/Main";
 import { CreateParticipantDto } from "../api/ServerApi";
 
-export default function EditModal(props: {
+export default function CreateModal(props: {
   show: boolean;
   onHide: () => void;
-  participant: Participant;
-  onSubmit: (params: { userId: string; data: CreateParticipantDto }) => void;
+  onSubmit: (dto: CreateParticipantDto) => void;
 }) {
-  const [paid, setPaid] = useState<boolean>(false);
   const [firstTime, setFirstTime] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
   const [phoneError, setPhoneError] = useState<boolean>(false);
+  const [paid, setPaid] = useState<boolean>(false);
 
   const handleSumbit = () => {
     if (!username) {
@@ -27,28 +25,23 @@ export default function EditModal(props: {
     }
     props.onHide();
     props.onSubmit({
-      userId: props.participant.user_id,
-      data: {
-        user_name: username,
-        user_phone: phone,
-        first_time: firstTime,
-        paid: paid,
-      },
+      user_name: username,
+      user_phone: phone,
+      first_time: firstTime,
+      paid: paid,
     });
   };
 
   useEffect(() => {
-    setPaid(props.participant.paid);
-    setFirstTime(props.participant.first_time);
-    setUsername(props.participant.user_name);
-    setPhone(props.participant.user_phone);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setFirstTime(false);
+    setUsername("");
+    setPhone("");
   }, [props.show]);
 
   return (
     <Modal centered show={props.show} onHide={props.onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>Редактировать участника</Modal.Title>
+        <Modal.Title>Добавить участника</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>

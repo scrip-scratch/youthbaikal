@@ -93,14 +93,15 @@ AppDataSource.initialize()
             user_id: (0, uuid_1.v4)(),
             user_name: req.body.user_name,
             first_time: req.body.first_time,
-            paid: false,
+            user_phone: req.body.user_phone,
+            paid: req.body.user_phone.paid,
             enter_date: "",
         });
         const response = await participantRepository.save(participant);
         res.json(response);
     });
     app.put("/participants/update/:id", async (req, res) => {
-        const { paid, token } = req.body;
+        const { paid, user_name, user_phone, first_time, token } = req.body;
         if (token !== secretToken) {
             res.status(401).json({ message: "Нет прав на редактирование" });
             return;
@@ -114,6 +115,9 @@ AppDataSource.initialize()
                 return;
             }
             participant.paid = paid;
+            participant.user_name = user_name;
+            participant.user_phone = user_phone;
+            participant.first_time = first_time;
             const updatedUser = await participantRepository.save(participant);
             res.status(200).json(updatedUser);
         }

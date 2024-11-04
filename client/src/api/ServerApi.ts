@@ -5,7 +5,9 @@ const server = "https://youth-baikal.store:5050";
 
 export interface CreateParticipantDto {
   user_name: string;
+  user_phone: string;
   first_time: boolean;
+  paid: boolean;
 }
 
 class ServerApi {
@@ -42,14 +44,17 @@ class ServerApi {
     }
   }
 
-  public async updateParticipant(params: { userId: string; paid: boolean }) {
+  public async updateParticipant(params: {
+    userId: string;
+    data: CreateParticipantDto;
+  }) {
     const endpoint = `${server}/participants/update/${params.userId}`;
 
     try {
       const response = await axios.put(endpoint, {
         userId: params.userId,
-        paid: params.paid,
         token: localStorage.getItem("token"),
+        ...params.data,
       });
       return response;
     } catch (error) {
