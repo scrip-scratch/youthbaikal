@@ -20,6 +20,7 @@ let Participant = class Participant {
         this.spices = "";
         this.first_time = false;
         this.paid = false;
+        this.payment_amount = 0;
         this.enter_date = "";
     }
 };
@@ -52,6 +53,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
 ], Participant.prototype, "paid", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Participant.prototype, "payment_amount", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

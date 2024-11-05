@@ -19,6 +19,7 @@ export interface Participant {
   first_time: boolean;
   spices: string;
   paid: boolean;
+  payment_amount: number;
   enter_date: string;
 }
 
@@ -134,6 +135,7 @@ export const Main = () => {
             <th>Телефон</th>
             <th>Первый раз</th>
             <th>Оплата</th>
+            <th>Сумма</th>
             <th>Обед</th>
             <th>Дата входа</th>
             <th></th>
@@ -166,6 +168,7 @@ export const Main = () => {
                     <CloseIcon size={25} />
                   )}
                 </td>
+                <td>{participant.payment_amount}</td>
                 <td style={{ maxWidth: 200 }}>{participant.spices}</td>
                 <td>
                   {participant.enter_date

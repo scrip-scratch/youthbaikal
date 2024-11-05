@@ -30,5 +30,8 @@ export class Participant {
   paid: boolean = false;
 
   @Column()
+  payment_amount: number = 0;
+
+  @Column()
   enter_date: string = "";
 }

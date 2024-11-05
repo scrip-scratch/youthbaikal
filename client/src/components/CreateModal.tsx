@@ -13,6 +13,7 @@ export default function CreateModal(props: {
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
   const [spices, setSpices] = useState<string>("");
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [paid, setPaid] = useState<boolean>(false);
 
@@ -31,6 +32,7 @@ export default function CreateModal(props: {
       first_time: firstTime,
       paid: paid,
       spices: spices,
+      payment_amount: isNaN(paymentAmount) ? 0 : paymentAmount,
     });
   };
 
@@ -79,6 +81,14 @@ export default function CreateModal(props: {
               className="w-100"
               value={spices}
               onChange={(e) => setSpices(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">К оплате</Form.Label>
+            <Form.Control
+              className="w-100"
+              value={paymentAmount}
+              onChange={(e) => setPaymentAmount(+e.target.value)}
             />
           </Form.Group>
           <Form.Check

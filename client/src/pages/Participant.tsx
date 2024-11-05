@@ -104,6 +104,16 @@ export const ParticipantPage = () => {
           {participant.enter_date ? getDateFormat(participant.enter_date) : "-"}
         </span>
       </h6>
+      <h6 className="d-flex">
+        <span className="text-muted">Обед:</span>
+        <span className="ms-2">
+          {participant.spices ? participant.spices : "-"}
+        </span>
+      </h6>
+      <h6 className="d-flex">
+        <span className="text-muted">К оплате:</span>
+        <span className="ms-2">{participant.payment_amount}</span>
+      </h6>
 
       {!participant.enter_date && (
         <Button className="mt-5 w-100 btn" onClick={handleEnter}>

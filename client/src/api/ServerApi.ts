@@ -9,6 +9,7 @@ export interface CreateParticipantDto {
   first_time: boolean;
   spices: string;
   paid: boolean;
+  payment_amount: number;
 }
 
 class ServerApi {
