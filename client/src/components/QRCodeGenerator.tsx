@@ -42,9 +42,9 @@ export const QRCodeGenerator = (props: {
           style={{
             width: 213,
             position: "absolute",
-            bottom: props.userName.length > 16 ? 142 : 150,
+            bottom: props.userName.length > 20 ? 142 : 150,
             left: 53,
-            fontSize: props.userName.length > 16 ? 15 : 16,
+            fontSize: props.userName.length > 20 ? 15 : 16,
           }}
         >
           {props.userName}
