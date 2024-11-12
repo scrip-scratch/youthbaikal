@@ -142,65 +142,69 @@ export const Main = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredParticipants.map((participant, index) => {
-            return (
-              <tr key={`participant-${index}`}>
-                <td>
-                  <Link
-                    to={`/participant/${participant.user_id}`}
-                    className="text-dark"
-                  >
-                    {participant.user_name}
-                  </Link>
-                </td>
-                <td>{participant.user_phone}</td>
-                <td>
-                  {participant.first_time ? (
-                    <CheckIcon size={25} />
-                  ) : (
-                    <CloseIcon size={25} />
-                  )}
-                </td>
-                <td>
-                  {participant.paid ? (
-                    <CheckIcon size={25} />
-                  ) : (
-                    <CloseIcon size={25} />
-                  )}
-                </td>
-                <td>{participant.payment_amount}</td>
-                <td style={{ maxWidth: 200 }}>{participant.spices}</td>
-                <td>
-                  {participant.enter_date
-                    ? getDateFormat(participant.enter_date)
-                    : "-"}
-                </td>
-                <td>
-                  <div className="d-flex">
-                    <div
-                      role="button"
-                      className="me-4"
-                      onClick={() => {
-                        setParticipantToQr(participant);
-                        setQrModal(true);
-                      }}
+          {filteredParticipants
+            .sort((a, b) => {
+              return (b.paid === true ? 1 : 0) - (a.paid === true ? 1 : 0);
+            })
+            .map((participant, index) => {
+              return (
+                <tr key={`participant-${index}`}>
+                  <td>
+                    <Link
+                      to={`/participant/${participant.user_id}`}
+                      className="text-dark"
                     >
-                      <QrIcon size={25} />
+                      {participant.user_name}
+                    </Link>
+                  </td>
+                  <td>{participant.user_phone}</td>
+                  <td>
+                    {participant.first_time ? (
+                      <CheckIcon size={25} />
+                    ) : (
+                      <CloseIcon size={25} />
+                    )}
+                  </td>
+                  <td>
+                    {participant.paid ? (
+                      <CheckIcon size={25} />
+                    ) : (
+                      <CloseIcon size={25} />
+                    )}
+                  </td>
+                  <td>{participant.payment_amount}</td>
+                  <td style={{ maxWidth: 200 }}>{participant.spices}</td>
+                  <td>
+                    {participant.enter_date
+                      ? getDateFormat(participant.enter_date)
+                      : "-"}
+                  </td>
+                  <td>
+                    <div className="d-flex">
+                      <div
+                        role="button"
+                        className="me-4"
+                        onClick={() => {
+                          setParticipantToQr(participant);
+                          setQrModal(true);
+                        }}
+                      >
+                        <QrIcon size={25} />
+                      </div>
+                      <div
+                        role="button"
+                        onClick={() => {
+                          setParticipantToEdit(participant);
+                          setEditModal(true);
+                        }}
+                      >
+                        <EditIcon size={25} />
+                      </div>
                     </div>
-                    <div
-                      role="button"
-                      onClick={() => {
-                        setParticipantToEdit(participant);
-                        setEditModal(true);
-                      }}
-                    >
-                      <EditIcon size={25} />
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </Table>
       {participantToQr && (

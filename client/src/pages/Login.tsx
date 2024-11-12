@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Form, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { serverApi } from "../api/ServerApi";
-import YouthLogo from "../assets/youth-logo.jpg";
+import YouthLogo from "../assets/youth-logo.png";
 import { MainContainer } from "../components/MainContainer";
 
 export const Login = () => {
