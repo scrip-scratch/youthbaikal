@@ -128,6 +128,21 @@ export const Main = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
       </Form.Group>
+      <div className="d-flex justify-content-between mb-3">
+        <div>Всего участников: {filteredParticipants.length}</div>
+        <div>
+          Оплачено / Общая сумма:{" "}
+          {filteredParticipants
+            .filter((participant) => participant.paid)
+            .reduce((acc, participant) => {
+              return acc + participant.payment_amount;
+            }, 0)}
+          {" / "}
+          {filteredParticipants.reduce((acc, participant) => {
+            return acc + participant.payment_amount;
+          }, 0)}
+        </div>
+      </div>
       <Table>
         <thead>
           <tr>
