@@ -1,15 +1,19 @@
 import axios from "axios";
 
 // const server = "http://localhost:5050";
-const server = "https://youth-baikal.store:5050";
+const server = "https://youth-baikal.ru:5050";
 
 export interface CreateParticipantDto {
   user_name: string;
   user_phone: string;
   first_time: boolean;
-  spices: string;
+  city: string;
+  church: string;
+  email: string;
   paid: boolean;
   payment_amount: number;
+  promo_code: string;
+  promo_discount: number;
 }
 
 class ServerApi {
@@ -86,7 +90,6 @@ class ServerApi {
 
     try {
       const response = await axios.post(endpoint, params);
-      console.log(response); // TODO: DELETE DEV LOG
       return response;
     } catch (error) {
       console.log(error);
@@ -103,6 +106,59 @@ class ServerApi {
     } catch (error) {
       console.log(error);
       return error;
+    }
+  }
+
+  public async deleteParticipant(userId: string) {
+    const endpoint = `${server}/participants/delete/${userId}`;
+
+    try {
+      const response = await axios.delete(endpoint, {
+        data: {
+          userId: userId,
+          token: localStorage.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  public async uploadBill(userId: string, file: File) {
+    const endpoint = `${server}/participants/upload-bill/${userId}`;
+
+    try {
+      const formData = new FormData();
+      formData.append("bill", file);
+      formData.append("token", localStorage.getItem("token") || "");
+
+      const response = await axios.post(endpoint, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+
+  public async downloadBill(userId: string) {
+    const endpoint = `${server}/participants/download-bill/${userId}`;
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.get(endpoint, {
+        params: { token },
+        responseType: "blob",
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+      return false;
     }
   }
 }

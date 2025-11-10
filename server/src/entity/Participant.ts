@@ -14,14 +14,26 @@ export class Participant {
   @Column()
   user_id: string = "";
 
-  @Column()
+  @Column({ nullable: true })
   user_name: string = "";
 
-  @Column()
+  @Column({ nullable: true })
   user_phone: string = "";
 
-  @Column()
-  spices: string = "";
+  @Column({ nullable: true })
+  birth_date: string = "";
+
+  @Column({ nullable: true })
+  city: string = "";
+
+  @Column({ nullable: true })
+  church: string = "";
+
+  @Column({ nullable: true })
+  email: string = "";
+
+  @Column({ nullable: true })
+  billFile: string = "";
 
   @Column()
   first_time: boolean = false;
@@ -29,9 +41,18 @@ export class Participant {
   @Column()
   paid: boolean = false;
 
-  @Column()
+  @Column({ default: 0 })
   payment_amount: number = 0;
 
-  @Column()
+  @Column({ nullable: true })
+  promo_code: string = "";
+
+  @Column({ nullable: true, default: 0 })
+  promo_discount: number = 0;
+
+  @Column({ nullable: true })
   enter_date: string = "";
+
+  @Column({ nullable: true })
+  payment_date: string = "";
 }

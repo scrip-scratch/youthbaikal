@@ -12,7 +12,11 @@ export default function CreateModal(props: {
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>("");
-  const [spices, setSpices] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [church, setChurch] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [promoCode, setPromoCode] = useState<string>("");
+  const [promoDiscount, setPromoDiscount] = useState<number>(0);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [phoneError, setPhoneError] = useState<boolean>(false);
   const [paid, setPaid] = useState<boolean>(false);
@@ -31,7 +35,11 @@ export default function CreateModal(props: {
       user_phone: phone,
       first_time: firstTime,
       paid: paid,
-      spices: spices,
+      city: city,
+      church: church,
+      email: email,
+      promo_code: promoCode,
+      promo_discount: promoDiscount,
       payment_amount: isNaN(paymentAmount) ? 0 : paymentAmount,
     });
   };
@@ -40,6 +48,11 @@ export default function CreateModal(props: {
     setFirstTime(false);
     setUsername("");
     setPhone("");
+    setCity("");
+    setChurch("");
+    setEmail("");
+    setPromoCode("");
+    setPromoDiscount(0);
   }, [props.show]);
 
   return (
@@ -74,13 +87,43 @@ export default function CreateModal(props: {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label className="mb-0">Обеды</Form.Label>
+            <Form.Label className="mb-0">Город</Form.Label>
             <Form.Control
-              as="textarea"
-              rows={3}
               className="w-100"
-              value={spices}
-              onChange={(e) => setSpices(e.target.value)}
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Церковь</Form.Label>
+            <Form.Control
+              className="w-100"
+              value={church}
+              onChange={(e) => setChurch(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Почта</Form.Label>
+            <Form.Control
+              className="w-100"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Промокод</Form.Label>
+            <Form.Control
+              className="w-100"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="mb-0">Скидка</Form.Label>
+            <Form.Control
+              className="w-100"
+              value={promoDiscount}
+              onChange={(e) => setPromoDiscount(+e.target.value)}
             />
           </Form.Group>
           <Form.Group className="mb-3">

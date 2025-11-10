@@ -1,13 +1,15 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
+import fileUpload from "express-fileupload";
+import fs from "fs";
+import https from "https";
+import http from "http";
+import path from "path";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import { Participant } from "./entity/Participant";
-import http from "http";
-import https from "https";
-import fs from "fs";
 const privateKey = fs.readFileSync("./cert/ssl_key.pem");
 const certificate = fs.readFileSync("./cert/ssl_cert.pem");
 const credentials = { key: privateKey, cert: certificate };
@@ -28,6 +30,12 @@ app.use(
   })
 );
 app.use(bodyParser.json({ limit: "10mb" }));
+app.use(
+  fileUpload({
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    createParentPath: true,
+  })
+);
 
 // const AppDataSource = new DataSource({
 //   type: "mysql",
@@ -41,15 +49,11 @@ app.use(bodyParser.json({ limit: "10mb" }));
 //   synchronize: true,
 // });
 const AppDataSource = new DataSource({
-  type: "mysql",
-  port: 3306,
-  username: "youth25",
-  database: "youth25",
-  entities: [Participant],
-  host: "localhost",
-  password: "zR5mC6wS7i",
-  connectTimeout: 100000,
+  type: "sqlite",
+  database: "database.sqlite",
   synchronize: true,
+  logging: false,
+  entities: [Participant],
 });
 
 AppDataSource.initialize()
@@ -57,6 +61,12 @@ AppDataSource.initialize()
     console.log("Соединение с базой данных установлено");
 
     const participantRepository = connection.getRepository(Participant);
+
+    app.get("/test", async (req, res) => {
+      res.json({
+        success: true,
+      });
+    });
 
     app.post("/validate", async (req, res) => {
       res.json({
@@ -102,49 +112,102 @@ AppDataSource.initialize()
         user_name: req.body.user_name,
         first_time: req.body.first_time,
         user_phone: req.body.user_phone,
+        birth_date: req.body.birth_date,
+        city: req.body.city,
+        church: req.body.church,
+        email: req.body.email,
         paid: req.body.paid,
-        spices: req.body.spices,
         payment_amount: req.body.payment_amount,
         enter_date: "",
+        promo_code: req.body.promo_code,
+        promo_discount: req.body.promo_discount,
       });
       const response = await participantRepository.save(participant);
-      res.json(response);
+      res.json({ success: true, participant: response });
     });
 
     // {
-    //   body: {
-    //     Name: 'test',
-    //     Surname: 'test',
-    //     Date: '01-01-1970',
-    //     Pol: 'Мужской',
-    //     Phone: '+7 (999) 999-99-99',
-    //     Email: 'test@test.ru',
-    //     'Сity': 'test',
-    //     'Сhurch': 'test',
-    //     Resettlement: 'Нет',
-    //     First: 'Нет',
-    //     'Сontact': 'Telegram',
-    //     spices: 'На 31 января — Боул, пирожное и чай (370₽); На 31 января — Сэндвич, пирожное и чай (280₽); На 1 февраля — Сэндвич, пирожное и чай (280₽)',
-    //     payment: '{"sys":"none","systranid":"0","orderid":"1118197065","products":["Участие ЮС Байкал 2025=1000","На 31 января  Боул, пирожное и чай 370=370","На 1 февраля  Сэндвич, пирожное и чай 280=280","На 31 января  Сэндвич, пирожное и чай 280=280"],"amount":"1930"}',
-    //     formid: 'form818317054',
-    //     formname: 'Cart'
-    //   },
-    //   success: true
+    //   Name: 'ТЕСТИ',
+    //   Surname: 'ТЕСТИ',
+    //   Date: '08-11-2025',
+    //   Pol: 'Мужской',
+    //   Phone: '+7 (995) 045-11-49',
+    //   Email: 'jimivom891@hh7f.com',
+    //   'Сity': '123123',
+    //   'Сhurch': '12412',
+    //   First: 'Нет',
+    //   Resettlement: 'Нет',
+    //   'Сontact': 'Telegram',
+    //   payment: '{
+    //     "sys":"none",
+    //     "systranid":"0",
+    //     "orderid":"1487047237",
+    //     "products":["Участие ЮС Байкал 2026=1000"],
+    //     "promocode":"МХЛ50",
+    //     "discountvalue":"50%",
+    //     "discount":"500",
+    //     "subtotal":"1000",
+    //     "amount":"500"
+    //   }',
+    //   formid: 'form1510234761',
+    //   formname: 'Cart'
     // }
 
+    // ФИО
+    // Дата рождения
+    // Город
+    // Церковь
+    // Почта
+    // Промокод
+    // Скидка
+    // Цена
+    // Оплата - есть / нет
+    // Чек - можно прикрепить pdf или фото
+    // Дата оплаты - вписывается в ручную
+
     app.post("/tilda/participants/create", async (req, res) => {
-      const participant = participantRepository.create({
-        user_id: uuidv4(),
-        user_name: req.body.Name + " " + req.body.Surname,
-        first_time: req.body.First !== "Нет",
-        user_phone: req.body.Phone,
-        paid: false,
-        spices: req.body.spices,
-        payment_amount: +JSON.parse(req.body.payment).amount,
-        enter_date: "",
-      });
-      const response = await participantRepository.save(participant);
-      res.json(response);
+      try {
+        console.log(req.body);
+        let paymentData = req.body.payment;
+
+        // 🧩 Универсальный парсер: поддержка и строки, и объектов
+        if (typeof paymentData === "string") {
+          try {
+            // Если строка содержит HTML-коды кавычек — заменяем
+            paymentData = JSON.parse(paymentData.replace(/&quot;/g, '"'));
+          } catch (err) {
+            console.warn("⚠️ Невозможно распарсить payment:", req.body.payment);
+            paymentData = {};
+          }
+        } else if (typeof paymentData !== "object" || paymentData === null) {
+          paymentData = {};
+        }
+
+        const participant = participantRepository.create({
+          user_id: uuidv4(),
+          user_name: `${req.body.Name || ""} ${req.body.Surname || ""}`.trim(),
+          first_time: req.body.First !== "Нет",
+          user_phone: req.body.Phone || "",
+          birth_date: req.body.Date || "",
+          paid: false,
+          city: req.body.City || "",
+          church: req.body.Church || "",
+          email: req.body.Email || "",
+          payment_amount: Number(paymentData.amount) || 0,
+          enter_date: "",
+          promo_code: paymentData.promocode || "",
+          promo_discount: Number(paymentData.discount) || 0,
+        });
+
+        const response = await participantRepository.save(participant);
+        res.json(response);
+      } catch (error) {
+        console.error("❌ Ошибка при создании участника:", error);
+        res.status(500).json({
+          message: "Ошибка при создании участника",
+          error: (error as Error).message,
+        });
+      }
     });
 
     app.put("/participants/update/:id", async (req, res) => {
@@ -152,10 +215,15 @@ AppDataSource.initialize()
         paid,
         user_name,
         user_phone,
+        birth_date,
         first_time,
         token,
-        spices,
+        city,
+        church,
+        email,
         payment_amount,
+        promo_code,
+        promo_discount,
       } = req.body;
 
       if (token !== secretToken) {
@@ -175,9 +243,14 @@ AppDataSource.initialize()
         participant.paid = paid;
         participant.user_name = user_name;
         participant.user_phone = user_phone;
+        participant.birth_date = birth_date;
         participant.first_time = first_time;
-        participant.spices = spices;
+        participant.city = city;
+        participant.church = church;
+        participant.email = email;
         participant.payment_amount = payment_amount;
+        participant.promo_code = promo_code;
+        participant.promo_discount = promo_discount;
 
         const updatedUser = await participantRepository.save(participant);
         res.status(200).json(updatedUser);
@@ -218,9 +291,145 @@ AppDataSource.initialize()
       }
     });
 
+    app.delete("/participants/delete/:id", async (req, res) => {
+      const { token } = req.body;
+
+      if (token !== secretToken) {
+        res.status(401).json({ message: "Нет прав на удаление" });
+        return;
+      }
+
+      try {
+        const participant = await participantRepository.findOne({
+          where: { user_id: req.params.id },
+        });
+
+        if (!participant) {
+          res.status(404).json({ message: "Пользователь не найден" });
+          return;
+        }
+
+        await participantRepository.remove(participant);
+        res.status(200).json({ success: true, message: "Пользователь удален" });
+      } catch (error) {
+        console.error("Ошибка при удалении пользователя:", error);
+        res
+          .status(500)
+          .json({ message: "Ошибка при удалении пользователя", error });
+      }
+    });
+
+    app.post("/participants/upload-bill/:id", async (req, res) => {
+      const { token } = req.body;
+      const { id } = req.params;
+
+      if (token !== secretToken) {
+        res.status(401).json({ message: "Нет прав на загрузку чека" });
+        return;
+      }
+
+      try {
+        const participant = await participantRepository.findOne({
+          where: { user_id: id },
+        });
+
+        if (!participant) {
+          res.status(404).json({ message: "Пользователь не найден" });
+          return;
+        }
+
+        // проверяем, пришёл ли файл
+        if (!req.files || !req.files.bill) {
+          res.status(400).json({ message: "Файл не загружен" });
+          return;
+        }
+
+        // Получаем файл
+        const bill = req.files.bill as fileUpload.UploadedFile;
+
+        // Генерируем уникальное имя файла, например, по user_id и дате
+        const fileExt = bill.name.split(".").pop();
+        const fileName = `bill_${id}_${Date.now()}.${fileExt}`;
+        const billsDir = path.join(__dirname, "..", "bills");
+        const filePath = path.join(billsDir, fileName);
+
+        // создаём директорию, если её нет
+        if (!fs.existsSync(billsDir)) {
+          fs.mkdirSync(billsDir, { recursive: true });
+        }
+
+        // Удаляем старый файл, если он существует
+        if (participant.billFile) {
+          const oldFilePath = path.join(billsDir, participant.billFile);
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        }
+
+        // Сохраняем файл на диск
+        await bill.mv(filePath);
+
+        // Обновляем название файла в базе
+        participant.billFile = fileName;
+        await participantRepository.save(participant);
+
+        res
+          .status(200)
+          .json({ success: true, message: "Чек загружен", fileName });
+      } catch (error) {
+        console.error("Ошибка при загрузке чека:", error);
+        res.status(500).json({ message: "Ошибка при загрузке чека", error });
+      }
+    });
+
+    app.get("/participants/download-bill/:id", async (req, res) => {
+      const { id } = req.params;
+      const { token } = req.query;
+
+      if (token !== secretToken) {
+        res.status(401).json({ message: "Нет прав на скачивание чека" });
+        return;
+      }
+
+      try {
+        const participant = await participantRepository.findOne({
+          where: { user_id: id },
+        });
+
+        if (!participant) {
+          res.status(404).json({ message: "Пользователь не найден" });
+          return;
+        }
+
+        if (!participant.billFile) {
+          res.status(404).json({ message: "Чек не найден" });
+          return;
+        }
+
+        const billsDir = path.join(__dirname, "..", "bills");
+        const filePath = path.join(billsDir, participant.billFile);
+
+        if (!fs.existsSync(filePath)) {
+          res.status(404).json({ message: "Файл чека не найден на сервере" });
+          return;
+        }
+
+        res.download(filePath, participant.billFile, (err) => {
+          if (err) {
+            console.error("Ошибка при скачивании чека:", err);
+            res.status(500).json({ message: "Ошибка при скачивании чека" });
+          }
+        });
+      } catch (error) {
+        console.error("Ошибка при скачивании чека:", error);
+        res.status(500).json({ message: "Ошибка при скачивании чека", error });
+      }
+    });
+
     // app.listen(port, () => {
     //   console.log(`Сервер запущен на порту ${port}`);
     // });
+    // app.listen(port, () => console.log(`http on ${port}`));
 
     const httpsServer = https.createServer(credentials, app);
     httpsServer.listen(port, () => console.log(`https on ${port}`));

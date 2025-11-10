@@ -3,7 +3,7 @@ import html2canvas from "html2canvas";
 import { QRCodeCanvas } from "qrcode.react";
 import { useRef } from "react";
 import { Button, Image } from "react-bootstrap";
-import QqBg from "../assets/REG_EDIT.png";
+import QqBg from "../assets/REG_EDIT.jpg";
 
 export const QRCodeGenerator = (props: {
   userId: string;
@@ -30,7 +30,7 @@ export const QRCodeGenerator = (props: {
         style={{ width: 320 }}
       >
         <QRCodeCanvas
-          value={`https://youth-baikal.store/participant/${props.userId}`}
+          value={`https://youth-baikal.ru/participant/${props.userId}`}
           size={218}
           style={{ position: "absolute", top: 132, left: 53 }}
           fgColor="#ffffff"

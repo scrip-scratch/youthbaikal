@@ -17,11 +17,18 @@ let Participant = class Participant {
         this.user_id = "";
         this.user_name = "";
         this.user_phone = "";
-        this.spices = "";
+        this.birth_date = "";
+        this.city = "";
+        this.church = "";
+        this.email = "";
+        this.billFile = "";
         this.first_time = false;
         this.paid = false;
         this.payment_amount = 0;
+        this.promo_code = "";
+        this.promo_discount = 0;
         this.enter_date = "";
+        this.payment_date = "";
     }
 };
 exports.Participant = Participant;
@@ -34,17 +41,33 @@ __decorate([
     __metadata("design:type", String)
 ], Participant.prototype, "user_id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Participant.prototype, "user_name", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Participant.prototype, "user_phone", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
-], Participant.prototype, "spices", void 0);
+], Participant.prototype, "birth_date", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "city", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "church", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "billFile", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Boolean)
@@ -54,13 +77,25 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Participant.prototype, "paid", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 0 }),
     __metadata("design:type", Number)
 ], Participant.prototype, "payment_amount", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "promo_code", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true, default: 0 }),
+    __metadata("design:type", Number)
+], Participant.prototype, "promo_discount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Participant.prototype, "enter_date", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Participant.prototype, "payment_date", void 0);
 exports.Participant = Participant = __decorate([
     (0, typeorm_1.Entity)()
 ], Participant);
