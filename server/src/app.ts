@@ -107,6 +107,13 @@ AppDataSource.initialize()
     });
 
     app.post("/participants/create", async (req, res) => {
+      // Генерируем номер участника
+      const allParticipants = await participantRepository.find();
+      const maxNumber = allParticipants.reduce((max, p) => {
+        return Math.max(max, p.participant_number || 0);
+      }, 0);
+      const participantNumber = maxNumber + 1;
+
       const participant = participantRepository.create({
         user_id: uuidv4(),
         user_name: req.body.user_name,
@@ -121,6 +128,8 @@ AppDataSource.initialize()
         enter_date: "",
         promo_code: req.body.promo_code,
         promo_discount: req.body.promo_discount,
+        participant_number: participantNumber,
+        created_at: new Date().toISOString(),
       });
       const response = await participantRepository.save(participant);
       res.json({ success: true, participant: response });
@@ -183,24 +192,89 @@ AppDataSource.initialize()
           paymentData = {};
         }
 
-        const participant = participantRepository.create({
-          user_id: uuidv4(),
-          user_name: `${req.body.Name || ""} ${req.body.Surname || ""}`.trim(),
-          first_time: req.body.First !== "Нет",
-          user_phone: req.body.Phone || "",
-          birth_date: req.body.Date || "",
-          paid: false,
-          city: req.body.City || "",
-          church: req.body.Church || "",
-          email: req.body.Email || "",
-          payment_amount: Number(paymentData.amount) || 0,
-          enter_date: "",
-          promo_code: paymentData.promocode || "",
-          promo_discount: Number(paymentData.discount) || 0,
+        const userName = `${req.body.Name || ""} ${
+          req.body.Surname || ""
+        }`.trim();
+        const userPhone = req.body.Phone || "";
+
+        // Проверяем, есть ли просроченная заявка с таким же именем и телефоном
+        const existingParticipants = await participantRepository.find({
+          where: [{ user_name: userName, user_phone: userPhone }],
         });
 
-        const response = await participantRepository.save(participant);
-        res.json(response);
+        let existingParticipant = null;
+        if (existingParticipants.length > 0) {
+          // Проверяем, есть ли просроченная заявка (не оплачена в течение 3 дней)
+          for (const p of existingParticipants) {
+            if (!p.paid && !p.payment_date) {
+              const createdAt = p.created_at ? new Date(p.created_at) : null;
+              if (createdAt) {
+                const daysDiff =
+                  (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+                if (daysDiff > 3) {
+                  existingParticipant = p;
+                  break;
+                }
+              } else {
+                // Если нет created_at, считаем просроченной
+                existingParticipant = p;
+                break;
+              }
+            }
+          }
+        }
+
+        // Генерируем номер участника
+        const allParticipants = await participantRepository.find();
+        const maxNumber = allParticipants.reduce((max, p) => {
+          return Math.max(max, p.participant_number || 0);
+        }, 0);
+        const participantNumber = maxNumber + 1;
+
+        if (existingParticipant) {
+          // Обновляем существующую просроченную заявку
+          existingParticipant.user_name = userName;
+          existingParticipant.first_time = req.body.First !== "Нет";
+          existingParticipant.user_phone = userPhone;
+          existingParticipant.birth_date = req.body.Date || "";
+          existingParticipant.city = req.body.City || "";
+          existingParticipant.church = req.body.Church || "";
+          existingParticipant.email = req.body.Email || "";
+          existingParticipant.payment_amount = Number(paymentData.amount) || 0;
+          existingParticipant.promo_code = paymentData.promocode || "";
+          existingParticipant.promo_discount =
+            Number(paymentData.discount) || 0;
+          existingParticipant.paid = false;
+          existingParticipant.payment_date = "";
+          existingParticipant.created_at = new Date().toISOString();
+
+          const response = await participantRepository.save(
+            existingParticipant
+          );
+          res.json(response);
+        } else {
+          // Создаем нового участника
+          const participant = participantRepository.create({
+            user_id: uuidv4(),
+            user_name: userName,
+            first_time: req.body.First !== "Нет",
+            user_phone: userPhone,
+            birth_date: req.body.Date || "",
+            paid: false,
+            city: req.body.City || "",
+            church: req.body.Church || "",
+            email: req.body.Email || "",
+            payment_amount: Number(paymentData.amount) || 0,
+            enter_date: "",
+            promo_code: paymentData.promocode || "",
+            promo_discount: Number(paymentData.discount) || 0,
+            participant_number: participantNumber,
+            created_at: new Date().toISOString(),
+          });
+
+          const response = await participantRepository.save(participant);
+          res.json(response);
+        }
       } catch (error) {
         console.error("❌ Ошибка при создании участника:", error);
         res.status(500).json({
@@ -224,6 +298,8 @@ AppDataSource.initialize()
         payment_amount,
         promo_code,
         promo_discount,
+        payment_date,
+        letter_date,
       } = req.body;
 
       if (token !== secretToken) {
@@ -251,6 +327,12 @@ AppDataSource.initialize()
         participant.payment_amount = payment_amount;
         participant.promo_code = promo_code;
         participant.promo_discount = promo_discount;
+        if (payment_date !== undefined) {
+          participant.payment_date = payment_date;
+        }
+        if (letter_date !== undefined) {
+          participant.letter_date = letter_date;
+        }
 
         const updatedUser = await participantRepository.save(participant);
         res.status(200).json(updatedUser);
@@ -429,10 +511,10 @@ AppDataSource.initialize()
     // app.listen(port, () => {
     //   console.log(`Сервер запущен на порту ${port}`);
     // });
-    // app.listen(port, () => console.log(`http on ${port}`));
+    app.listen(port, () => console.log(`http on ${port}`));
 
-    const httpsServer = https.createServer(credentials, app);
-    httpsServer.listen(port, () => console.log(`https on ${port}`));
+    // const httpsServer = https.createServer(credentials, app);
+    // httpsServer.listen(port, () => console.log(`https on ${port}`));
   })
   .catch((err) => {
     console.error("Error during Data Source initialization", err);

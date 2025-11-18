@@ -2,6 +2,7 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Login } from "../pages/Login";
 import { Main } from "../pages/Main";
 import { ParticipantPage } from "../pages/Participant";
+import { Statistics } from "../pages/Statistics";
 
 export const PrivateRoute = () => {
   const token = localStorage.getItem("token");
@@ -18,6 +19,7 @@ export const useRoutes = () => {
         <Route index element={<Main />} />
         <Route path="*" element={<Main />} />
         <Route path="/participant/:userId" element={<ParticipantPage />} />
+        <Route path="/statistics" element={<Statistics />} />
       </Route>
     </Routes>
   );

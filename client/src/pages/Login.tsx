@@ -67,7 +67,7 @@ export const Login = () => {
             src={YouthLogo}
             width={100}
             height={100}
-            style={{ position: "absolute", top: -100, left: 100, opacity: 0.7 }}
+            style={{ position: "absolute", top: -100, left: 100 }}
           />
         </div>
         <Form.Group className="w-100 mb-2 mt-4">

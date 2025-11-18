@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const server = "http://localhost:5050";
-const server = "https://youth-baikal.ru:5050";
+const server = "http://localhost:5050";
+// const server = "https://youth-baikal.ru:5050";
 
 export interface CreateParticipantDto {
   user_name: string;
@@ -14,6 +14,9 @@ export interface CreateParticipantDto {
   payment_amount: number;
   promo_code: string;
   promo_discount: number;
+  payment_date?: string;
+  letter_date?: string;
+  birth_date?: string;
 }
 
 class ServerApi {

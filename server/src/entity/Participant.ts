@@ -55,4 +55,13 @@ export class Participant {
 
   @Column({ nullable: true })
   payment_date: string = "";
+
+  @Column({ nullable: true })
+  letter_date: string = "";
+
+  @Column({ nullable: true })
+  participant_number: number = 0;
+
+  @Column({ nullable: true })
+  created_at: string = "";
 }
